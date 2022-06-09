@@ -1,0 +1,29 @@
+services:
+  database:
+    image: postgres:14.3
+    container_name: pg-db-exp-dbenc
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=Developer@123
+      - POSTGRES_DB=postgres_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/pgdata:rw
+  
+  api:
+    container_name: api-exp-dbenc
+    image: maven:3.8.5-openjdk-11
+    depends_on:
+      - database
+    volumes:
+      - .:/usr/dbenc-api
+    working_dir: /usr/dbenc-api
+    command: 'verify clean --fail-never'
+    entrypoint: ['mvn', 'spring-boot:run']
+    ports:
+      - "8085:8080"
+volumes:
+  pgdata:
+    name: pg-data
